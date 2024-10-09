@@ -83,7 +83,7 @@ korv = Mat("korv", 2, 40)
 gurka = Mat("gurka", 4, 50)
 pickle = Mat("Pickle", 6, 70)
 
-print([att.namn for att in attacks])
+
 
 # Går igenom mat listan så jag kan få ett max värde som random integer kan ta
 for i in mat_lista:
