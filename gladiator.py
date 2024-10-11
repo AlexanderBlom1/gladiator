@@ -19,6 +19,8 @@ attacks_max = -1
 
 mat_max = -1
 
+# Globl variabel
+vald_karaktär = None
 
 spel_status = True
 
@@ -59,6 +61,10 @@ class Karaktär:
         self.crit_chans = crit_chans
 
         Karaktärer_lista.append(self)
+
+class Block:
+    def __init__(self, namn):
+        self.namn = namn
         
 # karaktärer  ( NAMN , HÄLSA , CRIT_CHANS )
 du = Karaktär("du", 10, 10)
@@ -72,6 +78,9 @@ fiende = Karaktär("fiende", 10, 10)
 # attacker  ( NAMN , SKADA , CHANS , CRIT_SKADA , CRIT_CHANS )
 slag = Attack("slag", 1, 70, 2, 10)
 spark = Attack("spark", 2, 50, 1.5, 10)
+
+# blocker ( NAMN )
+block = Block("block")
 
 # svårighet  ( NAMN , MULTI )
 lätt = Svårighet("lätt", 0.5)
@@ -101,7 +110,7 @@ def din_attack():
         giltig_attack = None
 
         for att in attacks:
-            if att.namn.lower() == ditt_val:
+            if att.namn.lower() == ditt_val.lower():
                 giltig_attack = att  
                 break
 
@@ -135,6 +144,7 @@ for att in attacks:
 
 # Funktion för fiendens random attack
 def fiende_attack():
+    global vald_karaktär
 
     random_attack = random.randint(attacks_min, attacks_max)
     random_chans = random.randint(0, 100)
@@ -210,7 +220,6 @@ while True:
         if giltig_svårighet:
             svårighet_multi = giltig_svårighet.multi
             print(f"Du valde {giltig_svårighet.namn}")
-
             break
 
         else:
@@ -237,14 +246,15 @@ while True:
             du.hälsa = hälsa
             du.crit_chans = crit_chance
 
+            vald_karaktär = giltig_karaktär
+
             print(f"Du valde {giltig_karaktär.namn}")
+
 
             break
 
         else:
             print("Du valde en ogiltig karaktär. Försök igen!\n")
-
-
 
 # ---------------------------------------------------------------------------------------------------------------- #
 
