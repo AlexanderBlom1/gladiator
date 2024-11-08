@@ -1,5 +1,5 @@
 import random
-
+import os
 
 #lista med svårighet
 svårighet_lista = []
@@ -16,6 +16,7 @@ line_breaker = 50
 attacks = []
 attacks_min = 0
 attacks_max = -1
+meny = False
 
 mat_max = -1
 
@@ -23,7 +24,6 @@ mat_max = -1
 vald_karaktär = None
 
 spel_status = True
-
 
 # En klass där jag skappar olika mat objekt
 class Mat:
@@ -63,7 +63,7 @@ class Karaktär:
         Karaktärer_lista.append(self)
 
 class Block:
-    def __init__(self, namn):
+    def __init__(self, namn, chans):
         self.namn = namn
         
 # karaktärer  ( NAMN , HÄLSA , CRIT_CHANS )
@@ -80,7 +80,7 @@ slag = Attack("slag", 1, 70, 2, 10)
 spark = Attack("spark", 2, 50, 1.5, 10)
 
 # blocker ( NAMN )
-block = Block("block")
+block_test = Block("block", 100)
 
 # svårighet  ( NAMN , MULTI )
 lätt = Svårighet("lätt", 0.5)
@@ -138,6 +138,9 @@ def din_attack():
     elif random_chans > attack_chans:
         print(f"Du valde {attack_namn} och missade")
 
+def block():
+    return
+
 # For loop som går igenom listan med attacker och gör ett max värde som random kan ta
 for att in attacks:
     attacks_max += 1
@@ -189,14 +192,14 @@ def random_event():
         print(f"Plötsligt kommer en {mat_namn} från himlen och landar på marken")
         ditt_mat_val = input(f"Vill du konsumera {mat_namn}?\nDu kommer att få {mat_hälsa} hälsa men du har en {mat_chans}% chans att fienden attackerar dig.")
 
-        if ditt_mat_val == "ja":
+        if ditt_mat_val.lower() == "ja":
             du.hälsa += mat_hälsa
 
             if random_chans < mat_chans:
                 fiende_attack()
         
         else:
-            print("Eftersom du inte konsumerade korven så försvinner den.")
+            print(f"Eftersom du inte konsumerade {mat_namn} så försvinner den.")
 
 # En funktion som änrar fiendens hälsa pågrund av svårighet
 def svårighets_grad():
@@ -260,21 +263,35 @@ while True:
 
 svårighets_grad()
 
-# --------------------------------------------------- spel-loop ---------------------------------------------------#
+
+# --------------------------------------------------- spel-loop --------------------------------------------------- #
 
 while spel_status:
     if du.hälsa > 0 and fiende.hälsa > 0:
+        os.system("cls")
         print(f"Du har {du.hälsa} hälsa kvar och {du.crit_chans} kritsk chans. Din fiende har {fiende.hälsa} hälsa kvar och {fiende.crit_chans} kritisk chans\n")
         print("-" * line_breaker + "\n")
-        din_attack()
+
+        while not meny:
+            print("Vad vill du göra detta drag")
+            menyVal = input("1. Attackera \n2. Blockera \n3. Avsulta \n ")
+            if menyVal == "1":
+                meny = True
+                din_attack()
+            elif menyVal == "2":
+                meny = True
+            elif menyVal == "3":
+                meny = True
+                spel_status = False
 
         print("\n" + "-" * line_breaker + "\n")
 
         fiende_attack()
 
         print("\n" + "-" * line_breaker + "\n")
-
         random_event()
+
+        meny = False
 
     else:
         if du.hälsa <= 0:
