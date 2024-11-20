@@ -17,8 +17,12 @@ attacks = []
 attacks_min = 0
 attacks_max = -1
 meny = False
-
 mat_max = -1
+
+#
+rundor = 0
+
+
 
 # Globl variabel
 vald_karaktär = None
@@ -65,22 +69,23 @@ class Karaktär:
 class Block:
     def __init__(self, namn, chans):
         self.namn = namn
+        self.chans = chans
         
 # karaktärer  ( NAMN , HÄLSA , CRIT_CHANS )
 du = Karaktär("du", 10, 10)
 
-peter = Karaktär("peter", 6, 75)
-jörgen = Karaktär("jörgen", 20, 15)
-Magnus = Karaktär("Magnus", 15, 45)
+peter = Karaktär("Samnitus", 6, 75)
+jörgen = Karaktär("Hoplomachus", 20, 15)
+Magnus = Karaktär("Murmilo", 15, 45)
 
-fiende = Karaktär("fiende", 10, 10)
+fiende = Karaktär("Dimachaerius", 10, 10)
 
 # attacker  ( NAMN , SKADA , CHANS , CRIT_SKADA , CRIT_CHANS )
 slag = Attack("slag", 1, 70, 2, 10)
 spark = Attack("spark", 2, 50, 1.5, 10)
 
 # blocker ( NAMN )
-block_test = Block("block", 100)
+block = Block("block", 50)
 
 # svårighet  ( NAMN , MULTI )
 lätt = Svårighet("lätt", 0.5)
@@ -88,9 +93,9 @@ normalt = Svårighet("normalt", 1)
 svårt = Svårighet("svårt", 2)
 
 # mat
-korv = Mat("korv", 2, 40)
-gurka = Mat("gurka", 4, 50)
-pickle = Mat("Pickle", 6, 70)
+korv = Mat("Bröd", 2, 40)
+gurka = Mat("Kyckling", 4, 50)
+pickle = Mat("Vin", 6, 70)
 
 
 
@@ -138,8 +143,24 @@ def din_attack():
     elif random_chans > attack_chans:
         print(f"Du valde {attack_namn} och missade")
 
-def block():
-    return
+# Blockera funktion
+def blockera():
+    global du, fiende
+    random_chans = random.randint(0, 100)
+    
+    # Visar att du valde blockering
+    print("Du valde att blockera!")
+
+    # Blockera fiendens attack om blocken träffar
+    if random_chans <= block.chans:
+        print(f"Blockering lyckades! Du blockerade fiendens attack!")
+        # Blockeringen blockerar skada helt, så vi återvänder här och stoppar fiendens attack
+        return  
+
+    else:
+        print(f"Blockering misslyckades! Fienden lyckades träffa dig!")
+        fiende_attack()  # Om blocket misslyckas, kommer fienden att attackera
+
 
 # For loop som går igenom listan med attacker och gör ett max värde som random kan ta
 for att in attacks:
@@ -181,7 +202,7 @@ def random_event():
     random_chans = random.randint(0,100)
 
     if random_chans < 10:
-        random_mat = random.randint(0,mat_max)
+        random_mat = random.randint(0, mat_max)
 
         mat = mat_lista[random_mat]
         
@@ -189,18 +210,20 @@ def random_event():
         mat_hälsa = mat.hälsa
         mat_chans = mat.chans
 
-        print(f"Plötsligt kommer en {mat_namn} från himlen och landar på marken")
-        ditt_mat_val = input(f"Vill du konsumera {mat_namn}?\nDu kommer att få {mat_hälsa} hälsa men du har en {mat_chans}% chans att fienden attackerar dig.")
+        print(f"Plötsligt kommer en {mat_namn} från himlen och landar på marken!")
+        ditt_mat_val = input(f"Vill du konsumera {mat_namn}?\nDu kommer att få {mat_hälsa} hälsa, men du har en {mat_chans}% chans att fienden attackerar dig när du äter.\nSvar[JA/NEJ]: ")
 
         if ditt_mat_val.lower() == "ja":
             du.hälsa += mat_hälsa
-
+            print(f"Du åt {mat_namn} och återhämtade dig! Du har nu {du.hälsa} hälsa.")
+            
             if random_chans < mat_chans:
+                print("Men medan du äter, slår fienden till!")
                 fiende_attack()
         
         else:
-            print(f"Eftersom du inte konsumerade {mat_namn} så försvinner den.")
-
+            print(f"Eftersom du inte konsumerade {mat_namn}, försvinner den och du missar chansen att återhämta dig.")
+            
 # En funktion som änrar fiendens hälsa pågrund av svårighet
 def svårighets_grad():
     fiende.hälsa *= svårighet_multi
@@ -230,7 +253,7 @@ while True:
 
 while True:
         print("\n" + "-" * line_breaker)
-        ditt_val = input(f"Vilken karaktär vill du används?\n Peter - Hälsa: {peter.hälsa} Kritisk chans:{peter.crit_chans}\n Jörgen - Hälsa: {jörgen.hälsa} Kritisk chans: {jörgen.crit_chans}\n Magnus - Hälsa: {Magnus.hälsa} Kritisk chans: {Magnus.crit_chans} \n SVAR: ")
+        ditt_val = input(f"Vilken karaktär vill du används?\n Samnitus - Hälsa: {peter.hälsa} Kritisk chans:{peter.crit_chans}\n Hoplomachus - Hälsa: {jörgen.hälsa} Kritisk chans: {jörgen.crit_chans}\n Murmilo - Hälsa: {Magnus.hälsa} Kritisk chans: {Magnus.crit_chans} \n SVAR: ")
         print("-" * line_breaker + "\n\n")
         giltig_karaktär = None
 
@@ -268,7 +291,7 @@ svårighets_grad()
 
 while spel_status:
     if du.hälsa > 0 and fiende.hälsa > 0:
-        os.system("cls")
+        
         print(f"Du har {du.hälsa} hälsa kvar och {du.crit_chans} kritsk chans. Din fiende har {fiende.hälsa} hälsa kvar och {fiende.crit_chans} kritisk chans\n")
         print("-" * line_breaker + "\n")
 
@@ -278,7 +301,10 @@ while spel_status:
             if menyVal == "1":
                 meny = True
                 din_attack()
+                fiende_attack()
+
             elif menyVal == "2":
+                blockera()
                 meny = True
             elif menyVal == "3":
                 meny = True
@@ -286,19 +312,20 @@ while spel_status:
 
         print("\n" + "-" * line_breaker + "\n")
 
-        fiende_attack()
-
+       
         print("\n" + "-" * line_breaker + "\n")
         random_event()
 
         meny = False
 
+        rundor += 1
+
     else:
-        if du.hälsa <= 0:
+        if du.hälsa <= 0 or rundor >= 15:
             print("Du förlorade")
             spel_status = False
 
-        elif fiende.hälsa <= 0:
+        elif fiende.hälsa <= 0 or rundor >= 15:
             print("Du vann")
             spel_status = False
 
